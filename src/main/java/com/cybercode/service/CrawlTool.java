@@ -16,10 +16,14 @@ public class CrawlTool implements CrawlService {
 
 	private Site siteLinks;
 	private String source;
-
+	private Map<String,Integer> stat;
+	
+	private CrawlTool() {}
+	
 	public CrawlTool(String source) {
-		super();
 		this.source = source;
+		convert();
+		stat = getStatusStatistic();
 	}
 
 	public Map<String, Integer> getStatusStatistic() {
@@ -103,6 +107,14 @@ public class CrawlTool implements CrawlService {
 
 	public void setSource(String source) {
 		this.source = source;
+	}
+
+	public Map<String, Integer> getStat() {
+		return stat;
+	}
+
+	public void setStat(Map<String, Integer> stat) {
+		this.stat = stat;
 	}
 
 }
