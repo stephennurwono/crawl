@@ -7,7 +7,11 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.cybercode.model.Site;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CrawlTool implements CrawlService {
@@ -18,14 +22,6 @@ public class CrawlTool implements CrawlService {
 	private String source;
 	private Map<String,Integer> stat;
 	
-	private CrawlTool() {}
-	
-	public CrawlTool(String source) {
-		this.source = source;
-		convert();
-		stat = getStatusStatistic();
-	}
-
 	public Map<String, Integer> getStatusStatistic() {
 		URL currentUrl = null;
 		HttpURLConnection http = null;
@@ -65,10 +61,20 @@ public class CrawlTool implements CrawlService {
 	public void convert() {
 		Site siteLinks = null;
 		ObjectMapper mapper = new ObjectMapper();
-		try {
-			siteLinks = mapper.readValue(new URL(this.getSource()), Site.class);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (StringUtils.isNotEmpty(this.getSource())) {
+			try {
+				URL url = new URL(this.getSource());
+				siteLinks = mapper.readValue(url, Site.class);
+			} catch (JsonParseException e) {
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
 		this.setSiteLinks(siteLinks);
 	}
@@ -107,6 +113,8 @@ public class CrawlTool implements CrawlService {
 
 	public void setSource(String source) {
 		this.source = source;
+		convert();
+		stat = getStatusStatistic();
 	}
 
 	public Map<String, Integer> getStat() {
